@@ -1,0 +1,230 @@
+<!doctype html>
+<html>
+
+    <head>
+        <title>CodePencil</title>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+        <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css"> 
+        
+        <style>
+            body {
+                font-family: sans-serif;
+                padding: 0px;
+                margin: 0px;
+            }
+            #topbar {
+                width: 99.3%;
+                height: 30px;
+                background-color: black;
+                color: white;
+                padding: 5px;
+            }
+            #name {
+                float: left;
+                font-weight: bold;
+                font-size: 120%;
+                padding: 5px 5px;
+            }
+            #image {
+                float: left;
+                padding: 5px 5px;
+            }
+            #buttonContainer {
+                width: 233px;
+                margin: 0 auto; /*In modo tale che i <div> siano centrati*/
+            }
+            .toggleButton {
+                float: left;
+                border: 1px solid grey;
+                padding: 6px;
+                border-right: none;
+                font-size: 90%;
+            }
+            #downloadButton {
+                border: 1px solid grey;
+                padding: 6px;
+                font-size: 120%;
+                font-weight: bold;
+                background-color: #ffff4d;
+                width: 211px;
+                border-radius: 4px;
+                margin-top: 7px;
+                margin-left: 560px;
+            }
+            #creditsButton {
+                border: 1px solid grey;
+                padding: 6px;
+                font-size: 120%;
+                font-weight: bold;
+                background-color: white;
+                width: 62px;
+                border-radius: 4px;
+                float: right;
+                margin-top: -36px;
+                margin-right: 50px; 
+            }
+            #html {
+                border-top-left-radius: 4px;
+                border-bottom-left-radius: 4px;
+            }
+            #output {
+                border-top-right-radius: 4px;
+                border-bottom-right-radius: 4px;
+                border-right: 1px solid grey; /*Perché in .toggleButton abbiamo tolto il bordo destro*/
+            }
+            .active {
+                background-color: skyblue !important;
+            }
+            .highlightedButton {
+                background-color: grey !important;
+            }
+            textarea {
+                resize: none;
+                border-top: none;
+                border-color: grey;
+            }
+            .panel {
+                float: left;
+                width: 50%;
+                border-left: none;
+                border-bottom: none;
+            }
+            iframe {
+                border:none;
+            }
+            .hidden {
+                display: none;
+            }
+             #bottombar {
+                width: 100%;
+                height: 51px;
+                background-color: black;
+                float: left;
+            }
+        </style>
+    </head>
+
+    <body>
+        
+        <div id="topbar">
+            <div id="image">
+                <img src="https://i.imgur.com/Rq29Lfm.jpg" style="width: 20px; border-radius: 50%">
+            </div>
+            <div id="name">
+                CodePencil
+            </div>
+            <div id="buttonContainer">
+                <div class="toggleButton active" id="html">HTML</div>
+                <div class="toggleButton" id="css">CSS</div>
+                <div class="toggleButton" id="javascript">JavaScript</div>
+                <div class="toggleButton active" id="output">Output</div>
+            </div>
+        </div>
+        
+        <div id="bodyContainer">
+            <textarea id="htmlPanel" class="panel"><p id="paragraph">Matteo Marchetti (919694)</p></textarea>
+            <textarea id="cssPanel" class="panel hidden">p {color: skyblue;}</textarea>
+            <textarea id="javascriptPanel" class="panel hidden">document.getElementById("paragraph").innerHTML = "Il paragrafo e' stato modificato con JavaScript";</textarea>
+            <iframe id="outputPanel" class="panel"></iframe>
+        </div>
+        
+        <div id="bottombar">
+                <div id="downloadButton">Download HTML e CSS</div>
+                <div id="creditsButton">Crediti</div>
+        </div>
+
+        <script type="text/javascript">
+            
+            function updateOutput() {
+                $("iframe").contents().find("html").html("<html><head><style type='text/css'>" + $("#cssPanel").val() + "</style></head><body>" + $("#htmlPanel").val() + "</body></html>");
+                document.getElementById("outputPanel").contentWindow.eval($("#javascriptPanel").val()); /*Il metodo eval() esegue il codice JavaScript rappresentato come una stringa*/
+            };
+            
+            
+            /*Pulsanti in alto*/
+            $(".toggleButton").hover(function() {
+                $(this).addClass("highlightedButton"); /*Con this andiamo ad applicare la funzione sul pulsante che l'utente ha selezionato*/
+            }, function() {
+                $(this).removeClass("highlightedButton");
+            });
+            
+            $(".toggleButton").click(function() {
+                $(this).toggleClass("active");
+                $(this).removeClass("highlightedButton");
+                var panelId = $(this).attr("id") + "Panel";
+                $("#" + panelId).toggleClass("hidden");
+                var numberOfActivePanels = 4 - $(".hidden").length; /*In questo modo riusciamo a calcolare automaticamente la larghezza di ogni textarea in base al numero di pannelli attivi*/
+                $(".panel").width(($(window).width() / numberOfActivePanels) - 10);
+            });
+            
+            /*Pulsanti in basso*/
+            $("#downloadButton").hover(function() {
+                $(this).addClass("highlightedButton");
+            }, function() {
+                $(this).removeClass("highlightedButton");
+            });
+            
+             $("#creditsButton").hover(function() {
+                $(this).addClass("highlightedButton");
+            }, function() {
+                $(this).removeClass("highlightedButton");
+            });
+            
+            $("#downloadButton").click(function() {
+                $(this).toggleClass("active");
+                $(this).removeClass("highlightedButton");
+                setTimeout(function () {
+                    $("#downloadButton").toggleClass("active");
+                    }, 150);
+                downloadInnerHtml(fileName, 'outputPanel','text/html');
+            });
+            
+            /*Struttura della pagina*/
+            $(".panel").height($(window).height() - $("#topbar").height() - 65); 
+            $(".panel").width(($(window).width() / 2) - 10);
+        
+            /*Gestione dell'iframe*/
+            
+            updateOutput();
+            $("textarea").on('change keyup paste', function() {
+                updateOutput();
+            });
+            
+            /*Download*/
+            function downloadInnerHtml(filename, elId, mimeType) {
+                var elHtml = $("#" + elId).contents().find("html").html();
+                var link = document.createElement('a');
+                mimeType = mimeType || 'text/plain';
+                link.setAttribute('download', filename);
+                link.setAttribute('href', 'data:' + mimeType + ';charset=utf-8,' + encodeURIComponent(elHtml));
+                link.click(); 
+            }
+            var fileName =  'index.html';
+            
+            /*Crediti*/
+            $("#creditsButton").click(function() {
+                $.ajax({
+                    url: 'https://ssri-online.s3.eu-west-3.amazonaws.com/crediti.pdf',
+                    method: 'GET',
+                    xhrFields: {
+                    responseType: 'blob'
+                },
+                    success: function (data) {
+                    var a = document.createElement('a');
+                    var url = window.URL.createObjectURL(data);
+                    a.href = url;
+                    a.download = 'crediti.pdf';
+                    document.body.append(a);
+                    a.click();
+                    a.remove();
+                    window.URL.revokeObjectURL(url);
+                }
+                });
+            });
+
+        </script>
+        
+    </body>
+
+</html>

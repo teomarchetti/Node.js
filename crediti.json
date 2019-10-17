@@ -1,0 +1,11 @@
+{
+  "name": "crediti",
+  "version": "1.0.0",
+  "description": "Una pagina Web eseguita su Node.js",
+  "main": "http_server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Matteo Marchetti (919694)",
+  "license": "ISC"
+}
